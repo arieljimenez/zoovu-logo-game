@@ -1,25 +1,23 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { ThemeProvider } from 'emotion-theming';
 
-function App() {
+import { GameContainer, WelcomeContainer } from './containers';
+import theme from './theme';
+
+function App () {
+  const [userName, setUserName] = React.useState('');
+
+  const handleUserName = (userName: string) => {
+    setUserName(userName);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+        {userName
+          ? <GameContainer userName={userName} />
+          : <WelcomeContainer handleUserName={handleUserName} />
+        }
+    </ThemeProvider>
   );
 }
 
