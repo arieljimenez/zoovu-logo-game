@@ -4,6 +4,8 @@ html, body, #root {
 }
 
 body {
+  background: rgb(226,226,226);
+background: linear-gradient(0deg, rgba(226,226,226,1) 0%, rgba(250,250,250,1) 33%, rgba(255,255,255,1) 100%);
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
