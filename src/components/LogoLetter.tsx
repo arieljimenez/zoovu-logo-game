@@ -11,9 +11,10 @@ interface LogoLetterProps {
 }
 
 const sxLogoSockets = {
-  width: 150,
-  height: 150,
-  // border: '3px dashed lightskyblue'
+  bg: 'lightgray',
+  border: '3px dashed lightskyblue',
+  height: 130,
+  width: 140,
 }
 
 const EmptySocket = () => <Box sx={sxLogoSockets} />;
@@ -29,20 +30,19 @@ const LOGOS = {
 }
 
 const sxCard = {
-  width: 120,
-  bg: 'white',
-  display: 'flex',
   alignItems: 'center',
-  boxShadow: 'large',
-  flexDirection: 'column',
   borderRadius: '16px',
+  boxShadow: 'large',
+  display: 'flex',
+  flexDirection: 'column',
 
   svg: {
-    height: '100%',
+    flex: 'auto',
+    height: '130px',
+    py: '10px',
+    width: '140px',
   }
 }
-
-
 
 /**
  * LogoLetter component.

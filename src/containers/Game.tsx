@@ -32,6 +32,10 @@ const sxHeader= {
 
   '.score': {
     color: 'purple'
+  },
+
+  '.countDown': {
+    color: 'crimson'
   }
 }
 
@@ -45,15 +49,89 @@ const sxBody = {
   fontSize: 2,
 }
 
+const INITIAL_TIME_STATE = {
+  totalTime: 0,
+  timeStatus: 'halted',
+  countDown: 10
+}
+
 /**
  * Game Container.
  */
 const Game = ({ userName }: GameContainerProps): React.ReactElement => {
+  const [timeState, setTimeState] = React.useState({
+    ...INITIAL_TIME_STATE,
+  })
+
+  const increaseTotalTime = (amount: number): void => {
+    setTimeState({
+      ...timeState,
+      totalTime: timeState.totalTime + amount,
+    });
+  }
+
+  const reset = () => {
+    setTimeState({
+      ...INITIAL_TIME_STATE,
+    })
+  }
+
+  const startTime = () => {
+    setTimeState( {
+      ...timeState,
+      timeStatus: 'running'
+    });
+  }
+
+  const stopTime = () => {
+    setTimeState({
+      ...timeState,
+      timeStatus: 'restarting'
+    });
+  }
+
+  React.useEffect(() => {
+    const intervalID = setInterval(
+        () => {
+          if (timeState.timeStatus === 'running') {
+              increaseTotalTime(1);
+            };
+
+          if (timeState.timeStatus === 'restarting') {
+            const count = timeState.countDown - 1;
+
+            if (count > 0) {
+              decreaseCount()
+            } else {
+              reset();
+            }
+          };
+        },
+      1000
+    );
+
+    return () => clearInterval(intervalID);
+  });
+
+  const decreaseCount = () => {
+    setTimeState({
+      ...timeState,
+      countDown: timeState.countDown - 1,
+    })
+  }
+
+
+  console.log('== Game');
+  console.log({
+    timeStatus: timeState.timeStatus
+  });
+  console.log('Game == ');
+
 
   return (
     <Box sx={sxGameContainer}>
       <Box sx={sxHeader}>
-        <Box >
+        <Box>
           <Text className="headerTitle">
             Good Luck, {userName}!
           </Text>
@@ -63,15 +141,27 @@ const Game = ({ userName }: GameContainerProps): React.ReactElement => {
         </Box>
         <Box sx={sxScore}>
           <Text className="headerTitle score">
-            Your score: 25 seconds
+            Your score: {timeState.totalTime} seconds
           </Text>
           <Text className="headerSubTitle">
             The Faster the better!
           </Text>
+
+          {timeState.timeStatus === 'restarting'
+            ? <Text className="headerSubTitle countDown">Restarting on: {timeState.countDown} seconds</Text>
+            : null
+          }
         </Box>
       </Box>
       <Box sx={sxBody}>
-        <GameBoard />
+        <GameBoard {...
+          { startTime,
+            stopTime,
+            increaseTotalTime,
+            totalTime: timeState.totalTime,
+            timeStatus: timeState.timeStatus
+          }
+        } />
       </Box>
     </Box>
   )

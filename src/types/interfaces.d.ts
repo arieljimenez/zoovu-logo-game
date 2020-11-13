@@ -15,3 +15,11 @@ interface ReorderProps {
   startIndex: number;
   endIndex: number;
 }
+
+interface GameBoardProps {
+  startTime: () => void;
+  stopTime: () => void;
+  increaseTotalTime: (amount:number) => void;
+  totalTime: number;
+  timeStatus: string;
+}

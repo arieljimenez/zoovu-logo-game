@@ -15,34 +15,52 @@ const DROPPABLES = [
 
 const sxPiecesContainer = {
   display: 'flex',
-  height: 150,
   flex: 'auto',
+  height: 150,
 }
 
 const sxSlotContainer = {
   display: 'flex',
   justifyContent: 'space-between',
-  bg: 'lightgrey',
-  zIndex: -1
 }
 
 const sxGameBoardContainer = {
   mt: 5,
 }
 
+const sxMiddleText = {
+  mb: '50px',
+  mt: '80px',
+}
+
 /**
  * GameBoard component.
  */
-const GameBoard = (): React.ReactElement => {
+const GameBoard = ({ startTime, stopTime, increaseTotalTime, totalTime, timeStatus }: GameBoardProps): React.ReactElement => {
   const emptyPlaceHolders = getEmptySocketsInfo();
-  const [boardState, setBoardState] = React.useState<BoardState>({
-    logoLetters: getLetterObjects(),
+
+  const INITIAL_STATE = {
+    logoLetters: [],
     drop1: [emptyPlaceHolders[0]],
     drop2: [emptyPlaceHolders[1]],
     drop3: [emptyPlaceHolders[2]],
     drop4: [emptyPlaceHolders[3]],
     drop5: [emptyPlaceHolders[4]],
+  }
+
+  const [boardState, setBoardState] = React.useState<BoardState>({
+    ...INITIAL_STATE,
   });
+
+  React.useEffect(() => {
+    if (timeStatus === 'halted') {
+      setBoardState({
+        ...INITIAL_STATE,
+        logoLetters: getLetterObjects(),
+      });
+    }
+
+  }, [timeStatus])
 
   React.useEffect(() => {
     if (boardState.logoLetters.length === 0) {
@@ -53,12 +71,9 @@ const GameBoard = (): React.ReactElement => {
 
       win = letters.every(([letter]) => letter?.ok);
 
-
-      console.log('== GameBoard');
-      console.log({
-          win
-      });
-      console.log('GameBoard == ');
+      if (win && timeStatus === 'running') {
+        stopTime();
+      }
     }
   });
 
@@ -103,6 +118,11 @@ const GameBoard = (): React.ReactElement => {
       }
 
       removed.ok = matchPosition;
+
+      // penalize the user
+      if (!removed.ok) {
+        increaseTotalTime(10);
+      }
 
       // delete the empty slot and put our logo
       destClone.splice(0, 1, removed);
@@ -158,30 +178,38 @@ const GameBoard = (): React.ReactElement => {
   };
 
   const getItemStyle = ({ isDragging, draggableStyle }: GetItemStyleProps): object => ({
-    userSelect: 'none',
-    padding: '10px',
-    margin: `5px`,
-    display: 'flex',
-    borderRadius: '16px',
     background: isDragging ? 'lightgreen' : 'white', // change background colour if dragging
+    borderRadius: '16px',
+    display: 'flex',
+    m: `5px`,
+    py: '5px',
+    userSelect: 'none',
     ...draggableStyle  // styles we need to apply on draggables
   });
 
   const getListStyle = (isDraggingOver: boolean) => ({
-    background: isDraggingOver ? 'lightblue' : 'lightgrey',
-    padding: '2px',
-    height: 150,
-    display: 'flex',
-    width: '100%',
+    background: isDraggingOver ? 'lightblue' : 'none',
     borderRadius: '16px',
+    display: 'flex',
+    height: '160px',
+    mb: '2px',
+    width: '100%',
+  });
+
+  const getSlotItemStyle = ({ isDragging, draggableStyle }: GetItemStyleProps): object => ({
+    background: isDragging ? 'lightgreen' : 'white', // change background colour if dragging
+    borderRadius: '16px',
+    display: 'flex',
+    userSelect: 'none',
+    ...draggableStyle  // styles we need to apply on draggables
   });
 
   const getSlotStyle = (isDraggingOver: boolean) => ({
-    background: isDraggingOver ? 'lightblue' : 'lightgrey',
-    padding: '2px',
-    height: 150,
+    background: isDraggingOver ? 'lightblue' : 'none',
+    margin: '1px',
+    height: 130,
     display: 'flex',
-    width: 150,
+    width: 140,
     borderRadius: '16px',
     overflow: 'hidden',
   });
@@ -202,27 +230,31 @@ const GameBoard = (): React.ReactElement => {
                     draggableId={letterInfo.id}
                     index={index}
                   >
-                    {(provided, snapshot) => (
-                      <Box
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        sx={getItemStyle({
-                          isDragging: snapshot.isDragging,
-                          draggableStyle: provided.draggableProps.style,
-                        })}
-                      >
-                        <LogoLetter key={letterInfo.letter} logoLetter={letterInfo.letter} />
-                      </Box>
-                    )}
-                  </Draggable>
+                    {(provided, snapshot) => {
+                      if (snapshot.isDragging && timeStatus === 'halted' && totalTime === 0) {
+                        startTime();
+                      }
+                      return (
+                        <Box
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          sx={getItemStyle({
+                            isDragging: snapshot.isDragging,
+                            draggableStyle: provided.draggableProps.style,
+                          })}
+                        >
+                          <LogoLetter key={letterInfo.letter} logoLetter={letterInfo.letter} />
+                        </Box>
+                      )}}
+                    </Draggable>
                   ))}
                 </Box>
               {provided.placeholder}
               </div>
           )}
         </Droppable>
-        <Text>... and drop them here to make the logo great again!</Text>
+        <Text sx={sxMiddleText}>... and drop them here to make the logo great again!</Text>
         <Box sx={sxSlotContainer}>
           {DROPPABLES.map((stateName, index) => {
             const [slotInfo] = boardState[stateName];
@@ -244,7 +276,7 @@ const GameBoard = (): React.ReactElement => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            style={getItemStyle({
+                            style={getSlotItemStyle({
                               isDragging: snapshot.isDragging,
                               draggableStyle: provided.draggableProps.style,
                             })}

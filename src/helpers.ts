@@ -35,8 +35,8 @@ export const getEmptySocketsInfo = (): LetterObject[] => {
       id: `empty-${i}`,
       content: `empty ${i}`,
       letter: 'e' as LogoLetter,
-      ok: false,
       right: logoLettersMap[i] as LogoLetter,
+      ok: false,
     });
   }
 
