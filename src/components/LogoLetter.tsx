@@ -10,15 +10,26 @@ interface LogoLetterProps {
   logoLetter: LogoLetter
 }
 
+const sxLogoSockets = {
+  width: 150,
+  height: 150,
+  border: '3px dashed lightskyblue'
+}
+
+const EmptySocket = () => <Box sx={sxLogoSockets} />;
+
+
 const LOGOS = {
   z: LogoZ,
   o: LogoO,
   v: LogoV,
-  u: LogoU
+  u: LogoU,
+  o2: LogoO,
+  e: EmptySocket,
 }
 
 const sxCard = {
-  width: 150,
+  width: 120,
   bg: 'white',
   display: 'flex',
   alignItems: 'center',
@@ -29,6 +40,9 @@ const sxCard = {
     height: '100%',
   }
 }
+
+
+
 /**
  * LogoLetter component.
  */

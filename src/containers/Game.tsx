@@ -1,8 +1,7 @@
 import React from 'react';
 import { Box, Text } from 'rebass';
 
-import StartingPieces from '../components/StartingPieces';
-import LogoSockets from '../components/LogoSockets';
+import GameBoard from '../components/GameBoard';
 
 interface GameContainerProps {
   userName: string;
@@ -72,9 +71,7 @@ const Game = ({ userName }: GameContainerProps): React.ReactElement => {
         </Box>
       </Box>
       <Box sx={sxBody}>
-        <StartingPieces />
-        <Text>... and drop them here to make the logo great again!</Text>
-        <LogoSockets />
+        <GameBoard />
       </Box>
     </Box>
   )
