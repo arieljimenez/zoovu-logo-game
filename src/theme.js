@@ -1,4 +1,4 @@
-export default {
+const theme = {
   breakpoints: ['600px', '768px', '960px', '1280px'],
   fontSizes: [8, 12, 14, 16, 20, 24, 32, 48, 64],
   colors: {
@@ -28,4 +28,6 @@ export default {
       cursor: 'pointer'
     },
   },
-}
+};
+
+export default theme;

@@ -5,9 +5,6 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import LogoLetter from './LogoLetter';
 import { getLetterObjects, getEmptySocketsInfo } from '../helpers';
 
-
-const GRID_SIZE = 3;
-
 const DROPPABLES = [
   'drop1',
   'drop2',
@@ -248,7 +245,7 @@ const GameBoard = (): React.ReactElement => {
                       key={slotInfo.id}
                       draggableId={slotInfo.id}
                       index={index}
-                      isDragDisabled={slotInfo.letter == 'e'}
+                      isDragDisabled={slotInfo.letter === 'e'}
                     >
                       {(provided, snapshot) => (
                         <div
