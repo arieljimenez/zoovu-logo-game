@@ -1,28 +1,21 @@
 const logoLettersMap: { [key: number]: LogoLetter } = {
   1: 'z',
   2: 'o',
-  3: 'v',
-  4: 'u'
+  3: 'o2',
+  4: 'v',
+  5: 'u',
 }
 
 export const getLetters = (): LogoLetter[] => {
   const letters: LogoLetter[] = [];
-  let oCount = 0;
 
   for (let i = 0; letters.length < 5; i++) {
-    const num = Math.floor(1 + Math.random() * 4);
+    const num = Math.floor(1 + Math.random() * 5);
 
     const letter: LogoLetter = logoLettersMap[num];
 
     if (!letters.includes(letter)) {
       letters.push(letter);
-    } else if (letter === 'o' && oCount === 1) {
-      letters.push('o2');
-      oCount++;
-    }
-
-    if (letter === 'o') {
-      oCount++;
     }
 
     if (i > 500) { // just in case
@@ -42,6 +35,8 @@ export const getEmptySocketsInfo = (): LetterObject[] => {
       id: `empty-${i}`,
       content: `empty ${i}`,
       letter: 'e' as LogoLetter,
+      ok: false,
+      right: logoLettersMap[i] as LogoLetter,
     });
   }
 
@@ -55,6 +50,7 @@ export const getLetterObjects = (): LetterObject[] => {
     id: `letter-${letter}`,
     content: `letter ${letter}`,
     letter,
+    ok: false,
   }));
 }
 

@@ -13,40 +13,6 @@ const DROPPABLES = [
   'drop5'
 ];
 
-type BoardState = { [key: string]: LetterObject[]};
-
-interface GetItemStyleProps {
-  isDragging: boolean;
-  draggableStyle?: object;
-}
-
-type Result = {
-  logoLetters: LetterObject[];
-  drop1: LetterObject[];
-  drop2: LetterObject[];
-  drop3: LetterObject[];
-  drop4: LetterObject[];
-  drop5: LetterObject[];
-}
-
-type Dropeable = {
-  index: number;
-  droppableId: 'logoLetters' | 'drop1' | 'drop2' | 'drop3' | 'drop4' | 'drop5' ;
-}
-
-interface MoveProps {
-  source: LetterObject[];
-  destination: LetterObject[];
-  droppableSource: Dropeable;
-  droppableDestination: Dropeable;
-}
-
-interface ReorderProps {
-  list: LetterObject[];
-  startIndex: number;
-  endIndex: number;
-}
-
 const sxPiecesContainer = {
   display: 'flex',
   height: 150,
@@ -78,6 +44,24 @@ const GameBoard = (): React.ReactElement => {
     drop5: [emptyPlaceHolders[4]],
   });
 
+  React.useEffect(() => {
+    if (boardState.logoLetters.length === 0) {
+      const { drop1, drop2, drop3, drop4, drop5 } = boardState;
+      let win = false;
+
+      const letters = [drop1, drop2, drop3, drop4, drop5];
+
+      win = letters.every(([letter]) => letter?.ok);
+
+
+      console.log('== GameBoard');
+      console.log({
+          win
+      });
+      console.log('GameBoard == ');
+    }
+  });
+
   const getList = (id: string): LetterObject[] => {
     return boardState[id]
   };
@@ -91,7 +75,7 @@ const GameBoard = (): React.ReactElement => {
     return result;
   };
 
-  const move = ({ source, destination, droppableSource, droppableDestination }: MoveProps): Result => {
+  const move = ({ source, destination, droppableSource, droppableDestination }: MoveProps): BoardState => {
     let sourceClone: LetterObject[] = Array.from(source);
     const destClone: LetterObject[] = Array.from(destination);
 
@@ -111,6 +95,15 @@ const GameBoard = (): React.ReactElement => {
       // dont remove the previous item
       destClone.splice(droppableDestination.index, 0, removed);
     } else {
+      let matchPosition = removed.letter === destination[0].right;
+
+      // special case
+      if (removed.letter === 'o' || removed.letter === 'o2') {
+        matchPosition = destination[0].right === 'o' || destination[0].right === 'o2';
+      }
+
+      removed.ok = matchPosition;
+
       // delete the empty slot and put our logo
       destClone.splice(0, 1, removed);
     }
@@ -231,42 +224,41 @@ const GameBoard = (): React.ReactElement => {
         </Droppable>
         <Text>... and drop them here to make the logo great again!</Text>
         <Box sx={sxSlotContainer}>
-          {DROPPABLES.map((stateName, index) => (
-            <Droppable key={stateName} droppableId={stateName}>
-              {(provided, snapshot) => {
-                const [slotInfo] = boardState[stateName];
-
-                return (
-                  <div
-                    ref={provided.innerRef}
-                    style={getSlotStyle(snapshot.isDraggingOver)}
-                  >
-                    <Draggable
-                      key={slotInfo.id}
-                      draggableId={slotInfo.id}
-                      index={index}
-                      isDragDisabled={slotInfo.letter === 'e'}
+          {DROPPABLES.map((stateName, index) => {
+            const [slotInfo] = boardState[stateName];
+            return (
+              <Droppable key={stateName} droppableId={stateName} isDropDisabled={slotInfo.letter !== 'e'}>
+                {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      style={getSlotStyle(snapshot.isDraggingOver)}
                     >
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={getItemStyle({
-                            isDragging: snapshot.isDragging,
-                            draggableStyle: provided.draggableProps.style,
-                          })}
-                        >
-                          <LogoLetter logoLetter={slotInfo.letter} />
-                        </div>
-                      )}
-                    </Draggable>
-                  {provided.placeholder}
-                  </div>
-                )
-              }}
-            </Droppable>
-          ))}
+                      <Draggable
+                        key={slotInfo.id}
+                        draggableId={slotInfo.id}
+                        index={index}
+                        isDragDisabled={slotInfo.letter === 'e'}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={getItemStyle({
+                              isDragging: snapshot.isDragging,
+                              draggableStyle: provided.draggableProps.style,
+                            })}
+                          >
+                            <LogoLetter logoLetter={slotInfo.letter} />
+                          </div>
+                        )}
+                      </Draggable>
+                    {provided.placeholder}
+                    </div>
+                  )}
+              </Droppable>
+            )
+          })}
         </Box>
       </DragDropContext>
     </Box>
