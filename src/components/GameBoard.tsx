@@ -6,9 +6,17 @@ import LogoLetter from './LogoLetter';
 import { getLetterObjects, getEmptySocketsInfo } from '../helpers';
 
 
-const GRID_SIZE = 5;
+const GRID_SIZE = 3;
 
-type BoardState = {[key: string]: LetterObject[]};
+const DROPPABLES = [
+  'drop1',
+  'drop2',
+  'drop3',
+  'drop4',
+  'drop5'
+];
+
+type BoardState = { [key: string]: LetterObject[]};
 
 interface GetItemStyleProps {
   isDragging: boolean;
@@ -16,18 +24,22 @@ interface GetItemStyleProps {
 }
 
 type Result = {
-  droppable: LetterObject[];
-  droppable2: LetterObject[];
+  logoLetters: LetterObject[];
+  drop1: LetterObject[];
+  drop2: LetterObject[];
+  drop3: LetterObject[];
+  drop4: LetterObject[];
+  drop5: LetterObject[];
 }
 
 type Dropeable = {
   index: number;
-  droppableId: 'droppable' | 'droppable2';
+  droppableId: 'logoLetters' | 'drop1' | 'drop2' | 'drop3' | 'drop4' | 'drop5' ;
 }
 
 interface MoveProps {
-  source: any;
-  destination: any;
+  source: LetterObject[];
+  destination: LetterObject[];
   droppableSource: Dropeable;
   droppableDestination: Dropeable;
 }
@@ -44,6 +56,13 @@ const sxPiecesContainer = {
   flex: 'auto',
 }
 
+const sxSlotContainer = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  bg: 'lightgrey',
+  zIndex: -1
+}
+
 const sxGameBoardContainer = {
   mt: 5,
 }
@@ -52,18 +71,19 @@ const sxGameBoardContainer = {
  * GameBoard component.
  */
 const GameBoard = (): React.ReactElement => {
+  const emptyPlaceHolders = getEmptySocketsInfo();
   const [boardState, setBoardState] = React.useState<BoardState>({
     logoLetters: getLetterObjects(),
-    selected: getEmptySocketsInfo(),
+    drop1: [emptyPlaceHolders[0]],
+    drop2: [emptyPlaceHolders[1]],
+    drop3: [emptyPlaceHolders[2]],
+    drop4: [emptyPlaceHolders[3]],
+    drop5: [emptyPlaceHolders[4]],
   });
 
-
-  const id2List:{[key:string]:string} = {
-    droppable: 'logoLetters',
-    droppable2: 'selected'
+  const getList = (id: string): LetterObject[] => {
+    return boardState[id]
   };
-
-  const getList = (id: string): LetterObject[] => boardState[id2List[id]];
 
   // a little function to help us with reordering the result
   const reorder = ({ list, startIndex, endIndex }: ReorderProps): LetterObject[] => {
@@ -75,27 +95,38 @@ const GameBoard = (): React.ReactElement => {
   };
 
   const move = ({ source, destination, droppableSource, droppableDestination }: MoveProps): Result => {
-    const sourceClone: LetterObject[] = Array.from(source);
+    let sourceClone: LetterObject[] = Array.from(source);
     const destClone: LetterObject[] = Array.from(destination);
-    const [removed] = sourceClone.splice(droppableSource.index, 1);
 
-    destClone.splice(droppableDestination.index, 1, removed);
+    // selected arrays are just 1 item length
+    const dropIndex = droppableSource.droppableId === 'logoLetters'
+      ? droppableSource.index
+      : 0;
+
+    let [removed] = sourceClone.splice(dropIndex, 1);
+
+    // fill back as an empty slot
+    if (droppableSource.droppableId !== 'logoLetters') {
+      sourceClone = [...[emptyPlaceHolders[droppableSource.index]]];
+    }
+
+    if (droppableDestination.droppableId === 'logoLetters') {
+      // dont remove the previous item
+      destClone.splice(droppableDestination.index, 0, removed);
+    } else {
+      // delete the empty slot and put our logo
+      destClone.splice(0, 1, removed);
+    }
 
     const result = {} as Result;
     result[droppableSource.droppableId] = sourceClone;
     result[droppableDestination.droppableId] = destClone;
 
-
-    console.log('== GameBoard');
-    console.log({
-        result
-    });
-    console.log('GameBoard == ');
-
-
-    return result;
+    return {
+      ...boardState,
+      ...result
+    };
   };
-
 
   const onDragEnd = (result:any):void => {
     const { source, destination } = result;
@@ -106,24 +137,23 @@ const GameBoard = (): React.ReactElement => {
     }
 
     if (source.droppableId === destination.droppableId) {
-      const logoLetters = reorder ({
-        list: getList(source.droppableId),
-        startIndex: source.index,
-        endIndex: destination.index
-      });
+      // reorder selected is not allowed
+      if (destination.droppableId === 'logoLetters') {
+        const logoLetters = reorder ({
+          list: getList(source.droppableId),
+          startIndex: source.index,
+          endIndex: destination.index
+        });
 
-      let state:BoardState = { logoLetters };
+        let state:BoardState = { logoLetters };
 
-      if (source.droppableId === 'droppable2') {
-        state = { selected: logoLetters };
+        setBoardState({
+          ...boardState,
+          ...state,
+        });
       }
-
-      setBoardState({
-        ...boardState,
-        ...state,
-      });
-
     } else {
+
       const result = move({
         source: getList(source.droppableId),
         destination: getList(destination.droppableId),
@@ -132,35 +162,44 @@ const GameBoard = (): React.ReactElement => {
       });
 
       setBoardState({
-        logoLetters: result.droppable,
-        selected: result.droppable2,
+        ...result
       });
     }
   };
 
   const getItemStyle = ({ isDragging, draggableStyle }: GetItemStyleProps): object => ({
     userSelect: 'none',
-    padding: GRID_SIZE * 2,
-    margin: `0 ${GRID_SIZE}px 0 0`,
+    padding: '10px',
+    margin: `5px`,
     display: 'flex',
     borderRadius: '16px',
-    background: isDragging ? 'lightgreen' : 'grey', // change background colour if dragging
+    background: isDragging ? 'lightgreen' : 'white', // change background colour if dragging
     ...draggableStyle  // styles we need to apply on draggables
   });
 
   const getListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver ? 'lightblue' : 'lightgrey',
-    padding: GRID_SIZE + 1,
+    padding: '2px',
     height: 150,
     display: 'flex',
     width: '100%',
     borderRadius: '16px',
   });
 
+  const getSlotStyle = (isDraggingOver: boolean) => ({
+    background: isDraggingOver ? 'lightblue' : 'lightgrey',
+    padding: '2px',
+    height: 150,
+    display: 'flex',
+    width: 150,
+    borderRadius: '16px',
+    overflow: 'hidden',
+  });
+
   return (
     <Box sx={sxGameBoardContainer}>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="droppable" direction="horizontal">
+        <Droppable droppableId="logoLetters" direction="horizontal">
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
@@ -194,39 +233,44 @@ const GameBoard = (): React.ReactElement => {
           )}
         </Droppable>
         <Text>... and drop them here to make the logo great again!</Text>
-        <Droppable droppableId="droppable2" direction="horizontal">
-          {(provided, snapshot) => (
-            <div
-              ref={provided.innerRef}
-              style={getListStyle(snapshot.isDraggingOver)}
-            >
-              <Box sx={sxPiecesContainer}>
-                {boardState.selected.map((letterInfo, index) => (
-                  <Draggable
-                    key={letterInfo.id}
-                    draggableId={letterInfo.id}
-                    index={index}
+        <Box sx={sxSlotContainer}>
+          {DROPPABLES.map((stateName, index) => (
+            <Droppable key={stateName} droppableId={stateName}>
+              {(provided, snapshot) => {
+                const [slotInfo] = boardState[stateName];
+
+                return (
+                  <div
+                    ref={provided.innerRef}
+                    style={getSlotStyle(snapshot.isDraggingOver)}
                   >
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={getItemStyle({
-                          isDragging: snapshot.isDragging,
-                          draggableStyle: provided.draggableProps.style,
-                        })}
-                      >
-                        <LogoLetter key={letterInfo.id} logoLetter={letterInfo.letter} />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-              </Box>
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
+                    <Draggable
+                      key={slotInfo.id}
+                      draggableId={slotInfo.id}
+                      index={index}
+                      isDragDisabled={slotInfo.letter == 'e'}
+                    >
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={getItemStyle({
+                            isDragging: snapshot.isDragging,
+                            draggableStyle: provided.draggableProps.style,
+                          })}
+                        >
+                          <LogoLetter logoLetter={slotInfo.letter} />
+                        </div>
+                      )}
+                    </Draggable>
+                  {provided.placeholder}
+                  </div>
+                )
+              }}
+            </Droppable>
+          ))}
+        </Box>
       </DragDropContext>
     </Box>
   )

@@ -37,7 +37,7 @@ export const getLetters = (): LogoLetter[] => {
 export const getEmptySocketsInfo = (): LetterObject[] => {
   const info = [];
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 1; i < 6; i++) {
     info.push({
       id: `empty-${i}`,
       content: `empty ${i}`,

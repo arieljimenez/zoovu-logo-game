@@ -13,7 +13,7 @@ interface LogoLetterProps {
 const sxLogoSockets = {
   width: 150,
   height: 150,
-  border: '3px dashed lightskyblue'
+  // border: '3px dashed lightskyblue'
 }
 
 const EmptySocket = () => <Box sx={sxLogoSockets} />;
@@ -35,6 +35,7 @@ const sxCard = {
   alignItems: 'center',
   boxShadow: 'large',
   flexDirection: 'column',
+  borderRadius: '16px',
 
   svg: {
     height: '100%',

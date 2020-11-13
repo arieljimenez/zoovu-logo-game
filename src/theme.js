@@ -1,7 +1,6 @@
 export default {
   breakpoints: ['600px', '768px', '960px', '1280px'],
   fontSizes: [8, 12, 14, 16, 20, 24, 32, 48, 64],
-  space: [0, 4, 8, 16, 32, 64, 128, 256],
   colors: {
     blue: '#07c',
     purple: '#3C0078',
