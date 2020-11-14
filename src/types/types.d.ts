@@ -23,3 +23,9 @@ type Dropeable = {
   index: number;
   droppableId: 'logoLetters' | 'drop1' | 'drop2' | 'drop3' | 'drop4' | 'drop5';
 }
+
+type TimeState = {
+  totalTime: number;
+  timeStatus: 'halted' | 'running' | 'restarting';
+  countDown: number;
+}

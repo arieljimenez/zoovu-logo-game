@@ -23,3 +23,7 @@ interface GameBoardProps {
   totalTime: number;
   timeStatus: string;
 }
+
+interface UserScoreProps {
+  timeState: TimeState;
+}

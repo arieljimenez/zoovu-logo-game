@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Text } from 'rebass';
 
 import GameBoard from '../components/GameBoard';
+import UserScore from '../components/UserScore';
 
 interface GameContainerProps {
   userName: string;
@@ -39,9 +40,6 @@ const sxHeader= {
   }
 }
 
-const sxScore = {
-  textAlign: 'right'
-}
 
 const sxBody = {
   color: 'gray',
@@ -49,7 +47,7 @@ const sxBody = {
   fontSize: 2,
 }
 
-const INITIAL_TIME_STATE = {
+const INITIAL_TIME_STATE: TimeState = {
   totalTime: 0,
   timeStatus: 'halted',
   countDown: 10
@@ -59,7 +57,7 @@ const INITIAL_TIME_STATE = {
  * Game Container.
  */
 const Game = ({ userName }: GameContainerProps): React.ReactElement => {
-  const [timeState, setTimeState] = React.useState({
+  const [timeState, setTimeState] = React.useState<TimeState>({
     ...INITIAL_TIME_STATE,
   })
 
@@ -120,14 +118,6 @@ const Game = ({ userName }: GameContainerProps): React.ReactElement => {
     })
   }
 
-
-  console.log('== Game');
-  console.log({
-    timeStatus: timeState.timeStatus
-  });
-  console.log('Game == ');
-
-
   return (
     <Box sx={sxGameContainer}>
       <Box sx={sxHeader}>
@@ -139,19 +129,7 @@ const Game = ({ userName }: GameContainerProps): React.ReactElement => {
             Pick up the right cards
           </Text>
         </Box>
-        <Box sx={sxScore}>
-          <Text className="headerTitle score">
-            Your score: {timeState.totalTime} seconds
-          </Text>
-          <Text className="headerSubTitle">
-            The Faster the better!
-          </Text>
-
-          {timeState.timeStatus === 'restarting'
-            ? <Text className="headerSubTitle countDown">Restarting on: {timeState.countDown} seconds</Text>
-            : null
-          }
-        </Box>
+        <UserScore timeState={timeState} />
       </Box>
       <Box sx={sxBody}>
         <GameBoard {...

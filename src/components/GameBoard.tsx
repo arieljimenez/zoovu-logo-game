@@ -72,7 +72,7 @@ const GameBoard = ({ startTime, stopTime, increaseTotalTime, totalTime, timeStat
       win = letters.every(([letter]) => letter?.ok);
 
       if (win && timeStatus === 'running') {
-        stopTime();
+        stopTime(); //game set
       }
     }
   });
@@ -219,39 +219,38 @@ const GameBoard = ({ startTime, stopTime, increaseTotalTime, totalTime, timeStat
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="logoLetters" direction="horizontal">
           {(provided, snapshot) => (
-            <div
+            <Box sx={sxPiecesContainer}
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
-              >
-                <Box sx={sxPiecesContainer}>
-                {boardState.logoLetters.map((letterInfo, index) => (
-                  <Draggable
-                    key={letterInfo.id}
-                    draggableId={letterInfo.id}
-                    index={index}
-                  >
-                    {(provided, snapshot) => {
-                      if (snapshot.isDragging && timeStatus === 'halted' && totalTime === 0) {
-                        startTime();
-                      }
-                      return (
-                        <Box
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          sx={getItemStyle({
-                            isDragging: snapshot.isDragging,
-                            draggableStyle: provided.draggableProps.style,
-                          })}
-                        >
-                          <LogoLetter key={letterInfo.letter} logoLetter={letterInfo.letter} />
-                        </Box>
-                      )}}
-                    </Draggable>
-                  ))}
-                </Box>
+            >
+              {boardState.logoLetters.map((letterInfo, index) => (
+                <Draggable
+                  key={letterInfo.id}
+                  draggableId={letterInfo.id}
+                  index={index}
+                >
+                  {(provided, snapshot) => {
+                    if (snapshot.isDragging && timeStatus === 'halted' && totalTime === 0) {
+                      startTime();
+                    }
+                    return (
+                      <Box
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        sx={getItemStyle({
+                          isDragging: snapshot.isDragging,
+                          draggableStyle: provided.draggableProps.style,
+                        })}
+                      >
+                        <LogoLetter key={letterInfo.letter} logoLetter={letterInfo.letter} />
+                      </Box>
+                    )}}
+                  </Draggable>
+                ))
+              }
               {provided.placeholder}
-              </div>
+            </Box>
           )}
         </Droppable>
         <Text sx={sxMiddleText}>... and drop them here to make the logo great again!</Text>
