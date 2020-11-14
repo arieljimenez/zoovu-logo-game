@@ -17,8 +17,7 @@ const sxLogoSockets = {
   width: 140,
 }
 
-const EmptySocket = () => <Box sx={sxLogoSockets} />;
-
+const EmptySocket = () => <Box data-testid="empty" sx={sxLogoSockets} />;
 
 const LOGOS = {
   z: LogoZ,

@@ -68,6 +68,7 @@ const Welcome = ({ handleUserName }: WelcomeProps): React.ReactElement => {
             value={currentUserName}
             placeholder="Your name here"
             onChange={(e) => setCurrentUserName(e.target.value)}
+            data-testid="userName"
           />
         </Box>
         <Box sx={sxButtonContainer}>

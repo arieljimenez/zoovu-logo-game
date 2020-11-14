@@ -12,7 +12,7 @@ const sxScore = {
 const UserScore = ({ timeState }: UserScoreProps): React.ReactElement => {
   const { totalTime, timeStatus, countDown } = timeState;
 
-  return(
+  return (
     <Box sx={sxScore}>
       <Text className="headerTitle score">
         Your score: {totalTime} seconds
