@@ -73,6 +73,7 @@ const GameBoard = ({ startTime, stopTime, increaseTotalTime, totalTime, timeStat
 
       if (win && timeStatus === 'running') {
         stopTime(); //game set
+        alert(`Congratulations, your your score is ${totalTime}!`);
       }
     }
   });

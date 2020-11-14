@@ -16,7 +16,7 @@ describe('<LogoLetter />', () => {
 
       const svgElement = screen.getByText(svgString);
       expect(svgElement).toBeInTheDocument();
-      cleanup()
+      return cleanup()
     });
   });
 

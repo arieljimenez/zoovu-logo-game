@@ -23,7 +23,7 @@ describe('<Welcome />', () => {
     expect(element).toHaveValue('John Doe');
   });
 
-  it('should execute "handleUserName" once button is clicked ', () => {
+  it('should execute "handleUserName" once button is clicked', () => {
     const handleUserName = jest.fn();
     render(<Welcome handleUserName={handleUserName} />);
 
